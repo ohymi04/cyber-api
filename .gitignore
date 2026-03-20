@@ -1,0 +1,11 @@
+# Node modules
+node_modules/
+
+# Certificats SSL
+certs/
+
+# Variables d'environnement
+.env
+
+# Mac OS
+.DS_Store
