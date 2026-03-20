@@ -165,6 +165,7 @@ Project-Cyber-API/
 │   ├── Dockerfile
 │   ├── README.md
 │   ├── app.js
+│   ├── LICENSE
 │   ├── certs
 │   │   ├── cert.pem
 │   │   └── key.pem
