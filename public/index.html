@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enchanted API — Portail des Nuages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky-top: #4fc3f7;
+      --sky-mid: #81d4fa;
+      --sky-bottom: #b3e5fc;
+      --grass-dark: #66bb6a;
+      --grass-light: #a5d6a7;
+      --grass-bright: #c8e6c9;
+      --cloud: rgba(255,255,255,0.92);
+      --text-dark: #1a3a1a;
+      --text-mid: #2e6b3a;
+      --gold: #f9a825;
+      --panel-bg: rgba(255,255,255,0.18);
+      --panel-border: rgba(255,255,255,0.55);
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      overflow-x: hidden;
+      background: #4fc3f7;
+      min-height: 100vh;
+    }
+
+    /* ── SKY ── */
+    #world {
+      position: relative;
+      min-height: 100vh;
+      background: linear-gradient(180deg,
+        #29b6f6 0%,
+        #4fc3f7 30%,
+        #81d4fa 55%,
+        #b3e5fc 70%,
+        #c8e6c9 80%,
+        #81c784 90%,
+        #66bb6a 100%
+      );
+      overflow: hidden;
+    }
+
+    /* ── SUN ── */
+    #sun {
+      position: absolute;
+      top: 48px;
+      right: 120px;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #fff9c4, #ffe082 55%, #ffb300);
+      box-shadow: 0 0 60px 30px rgba(255,230,80,0.35), 0 0 120px 60px rgba(255,200,50,0.15);
+      animation: sunPulse 6s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes sunPulse {
+      0%,100% { box-shadow: 0 0 60px 30px rgba(255,230,80,0.35), 0 0 120px 60px rgba(255,200,50,0.15); }
+      50%      { box-shadow: 0 0 80px 45px rgba(255,230,80,0.50), 0 0 160px 80px rgba(255,200,50,0.25); }
+    }
+
+    /* ── CLOUDS ── */
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.88);
+      border-radius: 50px;
+      filter: blur(2px);
+      animation: drift linear infinite;
+      z-index: 2;
+    }
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255,255,255,0.88);
+      border-radius: 50%;
+    }
+    .cloud-1  { width:200px; height:55px; top: 80px;  left:-220px; animation-duration: 55s; animation-delay: 0s;   opacity:.9; }
+    .cloud-1::before { width:100px; height:80px; top:-35px; left:30px; }
+    .cloud-1::after  { width:70px;  height:60px; top:-25px; left:100px; }
+
+    .cloud-2  { width:140px; height:40px; top:160px; left:-160px; animation-duration: 70s; animation-delay:-20s;  opacity:.75; }
+    .cloud-2::before { width:75px; height:65px; top:-30px; left:20px; }
+    .cloud-2::after  { width:55px; height:50px; top:-20px; left:75px; }
+
+    .cloud-3  { width:260px; height:65px; top: 60px;  left:-290px; animation-duration: 80s; animation-delay:-40s;  opacity:.65; }
+    .cloud-3::before { width:120px; height:90px; top:-40px; left:50px; }
+    .cloud-3::after  { width:90px;  height:70px; top:-30px; left:140px; }
+
+    .cloud-4  { width:180px; height:50px; top:220px; left:-200px; animation-duration: 60s; animation-delay:-10s;  opacity:.55; }
+    .cloud-4::before { width:90px; height:70px; top:-30px; left:30px; }
+    .cloud-4::after  { width:65px; height:55px; top:-22px; left:100px; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(100vw + 320px)); }
+    }
+
+    /* ── BIRDS ── */
+    .bird {
+      position: absolute;
+      width: 28px;
+      height: 10px;
+      z-index: 3;
+      animation: fly linear infinite;
+    }
+    .bird::before, .bird::after {
+      content:'';
+      position:absolute;
+      border-top: 2.5px solid rgba(30,80,40,0.55);
+      border-radius: 50%;
+      width: 13px;
+      height: 8px;
+      top: 0;
+    }
+    .bird::before { left:0; border-top-left-radius: 50%; transform: rotate(-15deg); }
+    .bird::after  { right:0; border-top-right-radius: 50%; transform: rotate(15deg); }
+    .bird-1 { top: 130px; left:-40px; animation-duration: 18s; animation-delay: 0s; }
+    .bird-2 { top: 150px; left:-70px; animation-duration: 22s; animation-delay:-7s; }
+    .bird-3 { top: 110px; left:-90px; animation-duration: 26s; animation-delay:-12s; }
+    @keyframes fly {
+      from { transform: translateX(-100px); }
+      to   { transform: translateX(calc(100vw + 100px)); }
+    }
+
+    /* ── WIND LINES ── */
+    .wind {
+      position: absolute;
+      height: 1.5px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+      animation: blow linear infinite;
+      z-index: 2;
+    }
+    .wind-1 { width:180px; top:200px; left:-200px; animation-duration: 4s; animation-delay: 0s;   opacity:.7; }
+    .wind-2 { width:120px; top:260px; left:-140px; animation-duration: 5s; animation-delay:-1.5s; opacity:.5; }
+    .wind-3 { width:220px; top:180px; left:-240px; animation-duration: 3.5s; animation-delay:-2s; opacity:.6; }
+    .wind-4 { width:90px;  top:300px; left:-110px; animation-duration: 6s; animation-delay:-0.5s; opacity:.4; }
+    @keyframes blow {
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(100vw + 260px)); }
+    }
+
+    /* ── GRASS HILLS ── */
+    #ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 5;
+    }
+
+    /* ── GRASS BLADES (CSS) ── */
+    .grass-field {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 130px;
+      background: linear-gradient(180deg, #81c784 0%, #66bb6a 35%, #57a05a 100%);
+      z-index: 6;
+      overflow: hidden;
+    }
+    .blade {
+      position: absolute;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #a5d6a7, #388e3c);
+      border-radius: 4px 4px 0 0;
+      transform-origin: bottom center;
+      animation: sway ease-in-out infinite;
+    }
+    @keyframes sway {
+      0%,100% { transform: rotate(-6deg); }
+      50%      { transform: rotate(6deg); }
+    }
+
+    /* ── FLOWERS ── */
+    .flower {
+      position: absolute;
+      bottom: 14px;
+      z-index: 8;
+    }
+    .flower-stem {
+      width: 3px;
+      height: 22px;
+      background: #388e3c;
+      margin: 0 auto;
+      border-radius: 2px;
+    }
+    .flower-head {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin: 0 auto -6px;
+      position: relative;
+    }
+    .flower-head::before {
+      content:'';
+      position:absolute;
+      inset:-4px;
+      border-radius:50%;
+      opacity:.4;
+    }
+
+    /* ── CONTENT LAYOUT ── */
+    #content {
+      position: relative;
+      z-index: 10;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 70px 24px 260px;
+    }
+
+    /* ── TITLE ── */
+    .portal-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(10,60,20,0.35), 0 1px 0 rgba(0,0,0,0.1);
+      letter-spacing: 0.04em;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .portal-sub {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 52px;
+    }
+
+    /* ── GLASS PANELS ── */
+    .panel {
+      background: rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 40px rgba(30,100,40,0.12);
+    }
+
+    .panel h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1b5e20;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── ENDPOINT TESTER ── */
+    .endpoint-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .method-badge {
+      font-family: 'Lato', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(56,142,60,0.22);
+      color: #1b5e20;
+      border: 1px solid rgba(56,142,60,0.4);
+    }
+    .endpoint-url {
+      font-family: 'Lato', monospace;
+      font-size: 0.92rem;
+      color: #2e7d32;
+      font-weight: 400;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .send-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 8px 20px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(56,142,60,0.6);
+      background: rgba(255,255,255,0.35);
+      color: #1b5e20;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .send-btn:hover { background: rgba(255,255,255,0.6); }
+    .send-btn:active { transform: scale(0.97); }
+
+    /* ── API KEY INPUT ── */
+    .key-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .key-row label {
+      font-size: 0.82rem;
+      color: #2e7d32;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+    .key-input {
+      flex: 1;
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56,142,60,0.35);
+      background: rgba(255,255,255,0.45);
+      font-size: 0.88rem;
+      color: #1b5e20;
+      font-family: monospace;
+      outline: none;
+    }
+    .key-input:focus { border-color: rgba(56,142,60,0.7); background: rgba(255,255,255,0.65); }
+
+    /* ── RESPONSE BOX ── */
+    .response-box {
+      background: rgba(27,94,32,0.09);
+      border: 1px solid rgba(56,142,60,0.28);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-family: monospace;
+      font-size: 0.83rem;
+      color: #1b5e20;
+      min-height: 52px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      transition: opacity 0.3s;
+      line-height: 1.6;
+    }
+    .response-box.loading { opacity: 0.5; }
+    .response-box.success { border-color: rgba(56,142,60,0.6); }
+    .response-box.error   { border-color: rgba(200,50,50,0.4); color: #b71c1c; }
+
+    /* ── STATUS INDICATOR ── */
+    .status-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #43a047;
+      box-shadow: 0 0 8px rgba(67,160,71,0.6);
+      animation: blink 2s ease-in-out infinite;
+      margin-right: 6px;
+    }
+    @keyframes blink {
+      0%,100% { opacity:1; }
+      50%      { opacity:0.4; }
+    }
+
+    /* ── GRID ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 600px) {
+      .two-col { grid-template-columns: 1fr; }
+      .portal-title { font-size: 1.8rem; }
+    }
+
+    /* ── SCROLLING GRASS TEXT ── */
+    .wind-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    /* ── PARTICLES (floating petals) ── */
+    .petal {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50% 0;
+      background: rgba(255,255,255,0.7);
+      animation: petalFall linear infinite;
+      z-index: 4;
+    }
+    @keyframes petalFall {
+      0%   { transform: translateY(-20px) rotate(0deg) translateX(0); opacity:0; }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(100vh) rotate(360deg) translateX(60px); opacity:0; }
+    }
+
+    /* divider */
+    .rune-divider {
+      text-align: center;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.3em;
+      font-size: 1.1rem;
+      margin: 6px 0 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="world">
+  <!-- Sun -->
+  <div id="sun"></div>
+
+  <!-- Clouds -->
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+
+  <!-- Birds -->
+  <div class="bird bird-1"></div>
+  <div class="bird bird-2"></div>
+  <div class="bird bird-3"></div>
+
+  <!-- Wind lines -->
+  <div class="wind wind-1"></div>
+  <div class="wind wind-2"></div>
+  <div class="wind wind-3"></div>
+  <div class="wind wind-4"></div>
+
+  <!-- Petals -->
+  <div id="petals"></div>
+
+  <!-- Ground SVG hills + grass -->
+  <svg id="ground" viewBox="0 0 1440 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;height:180px;">
+    <defs>
+      <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#a5d6a7"/>
+        <stop offset="100%" stop-color="#66bb6a"/>
+      </linearGradient>
+      <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#c8e6c9"/>
+        <stop offset="100%" stop-color="#81c784"/>
+      </linearGradient>
+    </defs>
+    <!-- back hill -->
+    <ellipse cx="720" cy="200" rx="900" ry="140" fill="url(#hill2)" opacity="0.7"/>
+    <!-- front hill -->
+    <ellipse cx="380" cy="220" rx="700" ry="120" fill="url(#hill1)"/>
+    <ellipse cx="1100" cy="210" rx="650" ry="110" fill="url(#hill1)"/>
+    <!-- flat base -->
+    <rect x="0" y="140" width="1440" height="40" fill="#66bb6a"/>
+  </svg>
+
+  <!-- Animated grass blades strip -->
+  <div class="grass-field" id="grassField"></div>
+
+  <!-- Flowers -->
+  <div id="flowers"></div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div id="content">
+    <p class="wind-label">✦ Portail Enchanté ✦</p>
+    <h1 class="portal-title">Enchanted API</h1>
+    <p class="portal-sub">Cyber Node · DevSecOps · Monde Fantastique</p>
+
+    <!-- Status panel -->
+    <div class="panel">
+      <h2><span class="status-dot"></span> Statut du Portail</h2>
+      <div class="rune-divider">✦ · · · ✦</div>
+      <div class="two-col">
+        <div>
+          <p style="font-size:0.82rem;color:#2e7d32;margin-bottom:4px;font-weight:400;">Serveur</p>
+          <p style="font-size:1.1rem;color:#1b5e20;font-family:'Cinzel',serif;font-weight:600;" id="srv-status">En ligne</p>
+        </div>
+        <div>
+          <p style="font-size:0.82rem;color:#2e7d32;margin-bottom:4px;font-weight:400;">Heure du Royaume</p>
+          <p style="font-size:1.0rem;color:#1b5e20;font-family:monospace;font-weight:400;" id="clock">—</p>
+        </div>
+        <div>
+          <p style="font-size:0.82rem;color:#2e7d32;margin-bottom:4px;font-weight:400;">Host</p>
+          <p style="font-size:0.9rem;color:#1b5e20;font-family:monospace;">localhost:3000</p>
+        </div>
+        <div>
+          <p style="font-size:0.82rem;color:#2e7d32;margin-bottom:4px;font-weight:400;">Environnement</p>
+          <p style="font-size:0.9rem;color:#1b5e20;font-family:monospace;">Docker · Node 20</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Endpoint 1 -->
+    <div class="panel">
+      <h2>🌿 Portail Principal  <code style="font-size:0.78rem;font-weight:400;color:#388e3c;">/api</code></h2>
+      <div class="endpoint-row">
+        <span class="method-badge">GET</span>
+        <span class="endpoint-url">http://localhost:3000/api</span>
+        <button class="send-btn" onclick="callApi('/api')">Invoquer ↗</button>
+      </div>
+      <div class="response-box" id="res-api">En attente de la magie…</div>
+    </div>
+
+    <!-- Endpoint 2 -->
+    <div class="panel">
+      <h2>🔐 Sanctuaire Sécurisé  <code style="font-size:0.78rem;font-weight:400;color:#388e3c;">/secure</code></h2>
+      <div class="key-row">
+        <label>Clé runique :</label>
+        <input class="key-input" id="apiKey" type="text" placeholder="cyber-secret" value="cyber-secret" />
+      </div>
+      <div class="endpoint-row">
+        <span class="method-badge">GET</span>
+        <span class="endpoint-url">http://localhost:3000/secure</span>
+        <button class="send-btn" onclick="callApi('/secure')">Entrer ↗</button>
+      </div>
+      <div class="response-box" id="res-secure">Glyphe requis…</div>
+    </div>
+
+    <!-- Endpoint 3 -->
+    <div class="panel">
+      <h2>🌀 Matrice  <code style="font-size:0.78rem;font-weight:400;color:#388e3c;">/matrix</code></h2>
+      <div class="endpoint-row">
+        <span class="method-badge">GET</span>
+        <span class="endpoint-url">http://localhost:3000/matrix</span>
+        <button class="send-btn" onclick="callApi('/matrix')">Explorer ↗</button>
+      </div>
+      <div class="response-box" id="res-matrix">Mystère binaire…</div>
+    </div>
+
+    <!-- Info panel -->
+    <div class="panel">
+      <h2>📜 Tome DevSecOps</h2>
+      <div style="font-size:0.88rem;color:#2e6b3a;line-height:1.9;font-weight:400;">
+        <div style="margin-bottom:6px;">✦ &nbsp;Utilisateur non-root dans Docker</div>
+        <div style="margin-bottom:6px;">✦ &nbsp;Production deps uniquement (<code style="font-size:0.82rem;">--only=production</code>)</div>
+        <div style="margin-bottom:6px;">✦ &nbsp;Endpoint sécurisé par clé d'API</div>
+        <div style="margin-bottom:6px;">✦ &nbsp;Scan de vulnérabilités : <code style="font-size:0.82rem;">trivy image cyber-api</code></div>
+        <div>✦ &nbsp;Base Alpine (image minimale)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* Clock */
+  function tick() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR');
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* Grass blades */
+  const field = document.getElementById('grassField');
+  for (let i = 0; i < 90; i++) {
+    const b = document.createElement('div');
+    b.className = 'blade';
+    const h = 18 + Math.random() * 40;
+    const x = Math.random() * 100;
+    const delay = Math.random() * 3;
+    const dur = 1.5 + Math.random() * 2;
+    b.style.cssText = `left:${x}%;height:${h}px;animation-duration:${dur}s;animation-delay:${delay}s;opacity:${0.5+Math.random()*0.5}`;
+    field.appendChild(b);
+  }
+
+  /* Flowers */
+  const flowersEl = document.getElementById('flowers');
+  const colors = ['#ff8a65','#f48fb1','#fff176','#ce93d8','#80cbc4','#ffcc80'];
+  for (let i = 0; i < 18; i++) {
+    const f = document.createElement('div');
+    f.className = 'flower';
+    const x = 2 + Math.random() * 96;
+    const c = colors[Math.floor(Math.random()*colors.length)];
+    f.style.cssText = `left:${x}%;z-index:9;bottom:${8+Math.random()*30}px;`;
+    f.innerHTML = `<div class="flower-head" style="background:${c};box-shadow:0 0 8px ${c}55;"><div class="flower-head" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:5px;height:5px;border-radius:50%;background:#fff9;"></div></div><div class="flower-stem"></div>`;
+    flowersEl.appendChild(f);
+  }
+
+  /* Floating petals */
+  const petalsEl = document.getElementById('petals');
+  const petalColors = ['rgba(255,200,200,0.7)','rgba(255,240,180,0.7)','rgba(200,255,220,0.7)','rgba(220,200,255,0.7)'];
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const x = Math.random() * 100;
+    const dur = 6 + Math.random() * 10;
+    const delay = Math.random() * 12;
+    const c = petalColors[Math.floor(Math.random()*petalColors.length)];
+    p.style.cssText = `left:${x}%;top:-20px;animation-duration:${dur}s;animation-delay:${delay}s;background:${c};transform:rotate(${Math.random()*360}deg);`;
+    petalsEl.appendChild(p);
+  }
+
+  /* API calls */
+  async function callApi(path) {
+    const id = path.split('/').pop();
+    const box = document.getElementById('res-' + id);
+    box.className = 'response-box loading';
+    box.textContent = '✦ Invocation en cours…';
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (path === '/secure') {
+      const key = document.getElementById('apiKey').value.trim();
+      if (key) headers['x-api-key'] = key;
+    }
+
+    try {
+      const r = await fetch(path, { headers });
+      const data = await r.json();
+      box.className = 'response-box ' + (r.ok ? 'success' : 'error');
+      box.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      box.className = 'response-box error';
+      box.textContent = '✦ Connexion refusée — le portail dort.\n  Lance d\'abord : docker run -d -p 3000:3000 cyber-api';
+    }
+  }
+</script>
+</body>
+</html>
